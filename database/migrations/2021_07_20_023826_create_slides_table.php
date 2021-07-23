@@ -17,7 +17,7 @@ class CreateSlidesTable extends Migration
             $table->id();
             $table->integer('lesson_id');
             $table->string('title');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->timestamps();
         });
     }

@@ -38,8 +38,6 @@ class AuthController extends Controller
         $email = $credentials['email'];
         $password = $credentials['password'];
 
-        echo $email . $password;
-
         if (!$token = $this->loginForToken($email, $password)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -118,6 +116,25 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60
+        ]);
+    }
+
+    protected function updateMe(Request $request)
+    {
+        $user = User::find(auth()->user()->id);
+        $query = User::where('id', auth()->user()->id);
+
+        $query->update([
+            'name' => $request->input('name', $user->name),
+            'email' => $request->input('email', $user->email),
+            'imageUrl' => $request->input('imageUrl', $user->imageUrl)
+        ]);
+
+        $updatedUser = User::find(auth()->user()->id);
+
+        return response([
+            'message' => 'Updated details successfully',
+            'user' => $updatedUser
         ]);
     }
 }
