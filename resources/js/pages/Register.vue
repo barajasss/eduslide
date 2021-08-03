@@ -32,7 +32,9 @@ export default {
             const password = this.password;
 
             if (!email || !password || !name) {
-                Vue.$toast.error("Please enter name, email and password");
+                return Vue.$toast.error(
+                    "Please enter name, email and password"
+                );
             }
             try {
                 const res = await axios.post("/auth/register", {

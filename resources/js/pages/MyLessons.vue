@@ -1,16 +1,13 @@
 <template>
     <div>
-        <HomeOptions />
-        <Lessons />
+        <Lessons title="Manage My Lessons" myLessons />
     </div>
 </template>
 
 <script>
 import Lessons from "../components/Lessons";
-import HomeOptions from "../components/HomeOptions";
-
 export default {
-    components: { Lessons, HomeOptions }
+    components: { Lessons }
 };
 </script>
 

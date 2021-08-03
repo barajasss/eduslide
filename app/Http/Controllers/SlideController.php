@@ -16,9 +16,13 @@ class SlideController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $slides = Slide::get();
+        if ($request->has('lesson_id')) {
+            $slides = Slide::where('lesson_id', $request->input('lesson_id'))->get();
+        } else {
+            $slides = Slide::get();
+        }
         return $slides;
     }
 

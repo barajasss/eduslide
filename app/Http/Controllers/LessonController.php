@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Lesson;
+use App\Models\Favorite;
+use App\Models\Slide;
 
 class LessonController extends Controller
 {
@@ -16,9 +18,16 @@ class LessonController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $lessons = Lesson::with('user')->get();
+        if ($request->has('favorites') && $request->boolean('favorites')) {
+            $favoriteIds = Favorite::where('user_id', auth()->user()->id)->pluck('lesson_id')->toArray();
+            $lessons = Lesson::with('user')->whereIn('id', $favoriteIds)->latest()->get();
+        } else if ($request->has('my_lessons') && $request->boolean('my_lessons')) {
+            $lessons = Lesson::with('user')->where('user_id', auth()->user()->id)->latest()->get();
+        } else {
+            $lessons = Lesson::with('user')->latest()->get();
+        }
         if (!is_null($lessons)) {
             return $lessons;
         }
@@ -60,7 +69,7 @@ class LessonController extends Controller
     public function show($id)
     {
 
-        $lesson = Lesson::find($id);
+        $lesson = Lesson::with('user')->find($id);
         if (!is_null($lesson)) {
             return $lesson;
         }
@@ -111,6 +120,8 @@ class LessonController extends Controller
             return ['message' => 'The lesson does not belong to the user', 'success' => false];
         }
         $result = Lesson::where('id', $id)->delete();
+        // delete also its slides;
+        Slide::where('lesson_id', $id)->delete();
         if ($result) {
             return ['success' => true];
         }

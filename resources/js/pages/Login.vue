@@ -48,7 +48,7 @@ export default {
                 });
                 if (res.data.access_token) {
                     await this.getUser(res.data.access_token);
-                    Vue.$toast.success("Registered Successfully");
+                    Vue.$toast.success("Logged in Successfully");
                     this.$router.replace({ name: "home" });
                 } else {
                     Vue.$toast.error("Some error occured");

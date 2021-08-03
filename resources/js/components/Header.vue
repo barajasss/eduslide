@@ -1,6 +1,8 @@
 <template>
     <div class="header">
-        <div class="header-title">Eduslide</div>
+        <div class="header-title" @click="$router.push('/')">
+            Eduslide
+        </div>
         <div class="header-links" v-if="authenticated">
             <router-link :to="{ name: 'home' }">Home</router-link>
             <router-link :to="{ name: 'profile' }">Profile</router-link>
@@ -40,6 +42,7 @@ export default {
 
     .header-title {
         color: blue;
+        cursor: pointer;
         font-size: 1.5em;
     }
     .header-links {

@@ -16,9 +16,13 @@ class FavoriteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $favorites = Favorite::where('user_id', auth()->user()->id)->get();
+        if ($request->has('lesson_id')) {
+            $favorites = Favorite::where('user_id', auth()->user()->id)->where('lesson_id', $request->input('lesson_id'))->get();
+        } else {
+            $favorites = Favorite::where('user_id', auth()->user()->id)->get();
+        }
         return $favorites;
     }
 
