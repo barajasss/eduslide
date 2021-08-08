@@ -1936,7 +1936,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     title: {
-      type: String,
+      type: [Number, String],
       "default": ""
     },
     inverted: {
@@ -2363,6 +2363,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   model: {
     prop: "value",
@@ -2380,7 +2387,11 @@ __webpack_require__.r(__webpack_exports__);
       "default": "text"
     },
     index: {
-      type: Number
+      type: [Number, String]
+    },
+    useDefaultHtml: {
+      type: Boolean,
+      "default": false
     }
   },
   mounted: function mounted() {
@@ -2449,6 +2460,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -2464,6 +2489,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     showDelete: {
+      type: Boolean,
+      "default": false
+    },
+    showEdit: {
       type: Boolean,
       "default": false
     }
@@ -2489,7 +2518,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context.sent;
 
                 if (res.data.success) {
-                  _this.$emit("removeLesson");
+                  _this.$emit("updateLessons");
 
                   Vue.$toast.success("Lesson deleted successfully.");
                 } else {
@@ -2545,6 +2574,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -2556,14 +2602,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     myLessons: {
       type: Boolean,
       "default": false
+    },
+    favorites: {
+      type: Boolean,
+      "default": false
     }
   },
   data: function data() {
     return {
       lessons: [],
-      page: 1,
+      page: 0,
       itemsPerPage: 3,
-      totalResults: 0
+      totalResults: 0,
+      totalPages: 0,
+      isLoading: false
     };
   },
   components: {
@@ -2571,26 +2623,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     Paginator: _Paginator__WEBPACK_IMPORTED_MODULE_2__.default
   },
   mounted: function mounted() {
-    var _this = this;
-
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              if (_this.$route.query.page) {
-                _this.page = Number(_this.$route.query.page);
-              }
-
-              if (!(_this.page === 1)) {
-                _context.next = 4;
-                break;
-              }
-
-              _context.next = 4;
-              return _this.fetchLessons();
-
-            case 4:
             case "end":
               return _context.stop();
           }
@@ -2600,28 +2637,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   watch: {
     page: function page(e) {
+      window.scrollTo({
+        top: 0
+      });
       this.fetchLessons();
     }
   },
   methods: {
-    fetchLessons: function fetchLessons() {
-      var _this2 = this;
+    updateLessons: function updateLessons() {
+      var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-        var res;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return axios.get("/lessons?page=".concat(_this2.page, "&limit=").concat(_this2.itemsPerPage));
+                return _this.fetchLessons();
 
               case 2:
-                res = _context2.sent;
-                _this2.lessons = res.data.lessons;
-                _this2.totalResults = res.data.totalResults;
-
-              case 5:
               case "end":
                 return _context2.stop();
             }
@@ -2629,9 +2663,64 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee2);
       }))();
     },
+    fetchLessons: function fetchLessons() {
+      var _this2 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+        var url, res;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _this2.isLoading = true;
+                url = "/lessons?page=".concat(_this2.page, "&limit=").concat(_this2.itemsPerPage);
+
+                if (_this2.favorites) {
+                  url += "&favorites=true";
+                }
+
+                if (_this2.myLessons) {
+                  url += "&my_lessons=true";
+                }
+
+                _context3.prev = 4;
+                _context3.next = 7;
+                return axios.get(url);
+
+              case 7:
+                res = _context3.sent;
+                _this2.lessons = res.data.lessons;
+                _this2.totalResults = res.data.totalResults;
+                _context3.next = 15;
+                break;
+
+              case 12:
+                _context3.prev = 12;
+                _context3.t0 = _context3["catch"](4);
+                console.log("Error in loading lessons");
+
+              case 15:
+                _this2.isLoading = true;
+
+              case 16:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, null, [[4, 12]]);
+      }))();
+    },
     handlePaginatorUpdate: function handlePaginatorUpdate(data) {
-      var page = data.page;
-      this.page = page;
+      var page = data.page,
+          totalPages = data.totalPages;
+
+      if (page) {
+        this.page = page;
+      }
+
+      if (totalPages) {
+        this.totalPages = totalPages;
+      }
     }
   }
 });
@@ -2705,15 +2794,35 @@ __webpack_require__.r(__webpack_exports__);
           page: e
         }
       });
+    },
+    totalResults: function totalResults(e) {
+      this.emitPageUpdate({
+        totalPages: this.totalPages
+      });
     }
+  },
+  mounted: function mounted() {
+    var page = 1; // read page from query if exists
+
+    if (this.$route.query.page) {
+      page = Number(this.$route.query.page);
+    }
+
+    this.emitPageUpdate({
+      page: page
+    });
   },
   methods: {
     updatePage: function updatePage(i) {
       if (i > 0 && i <= this.totalPages) {
-        this.$emit("update", {
-          page: i
+        this.emitPageUpdate({
+          page: i,
+          totalPages: this.totalPages
         });
       }
+    },
+    emitPageUpdate: function emitPageUpdate(data) {
+      this.$emit("update", data);
     }
   },
   computed: {
@@ -2821,6 +2930,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
@@ -2838,7 +2954,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       currentSlide: {
         title: "",
         content: ""
-      }
+      },
+      fullScreenMode: false
     };
   },
   mounted: function mounted() {
@@ -2855,8 +2972,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 2:
               _this.index = 0;
               _this.currentSlide = _this.slides[_this.index];
+              document.addEventListener("keydown", _this.handleKeyDown);
+              document.addEventListener("fullscreenchange", _this.handleFullScreen);
 
-            case 4:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -2898,6 +3017,49 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (index >= 0 && index < this.slides.length) {
         this.index = index;
       }
+    },
+    handleKeyDown: function handleKeyDown(e) {
+      switch (e.key) {
+        case "ArrowLeft":
+          {
+            this.updateIndex(this.index - 1);
+            break;
+          }
+
+        case "ArrowRight":
+          {
+            this.updateIndex(this.index + 1);
+            break;
+          }
+
+        case "f":
+          {
+            if (document.fullscreenElement) {
+              this.exitFullScreen();
+            } else {
+              this.enableFullScreen();
+            }
+
+            break;
+          }
+      }
+    },
+    enableFullScreen: function enableFullScreen() {
+      var el = this.$refs.slideList;
+
+      if (el.requestFullscreen) {
+        el.requestFullscreen();
+      }
+    },
+    exitFullScreen: function exitFullScreen() {
+      document.exitFullscreen();
+    },
+    handleFullScreen: function handleFullScreen() {
+      if (document.fullscreenElement) {
+        this.fullScreenMode = true;
+      } else {
+        this.fullScreenMode = false;
+      }
     }
   }
 });
@@ -2920,6 +3082,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Form_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/Form.vue */ "./resources/js/components/Form.vue");
 /* harmony import */ var _components_Input_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/Input.vue */ "./resources/js/components/Input.vue");
 /* harmony import */ var _components_Button_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/Button.vue */ "./resources/js/components/Button.vue");
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 
 
@@ -2968,6 +3131,31 @@ function _asyncIterator(iterable) { var method; if (typeof Symbol !== "undefined
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 
@@ -2982,153 +3170,269 @@ function _asyncIterator(iterable) { var method; if (typeof Symbol !== "undefined
     return {
       lessonTitle: "",
       lessonDescription: "",
-      slides: []
+      slides: [],
+      slideNumbers: [],
+      editMode: false,
+      lessonId: 0
     };
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapState)("auth", ["user"])),
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapState)("auth", ["user"])), {}, {
+    enabledSlides: function enabledSlides() {
+      return this.slides.filter(function (slide) {
+        return !slide.disabled;
+      });
+    }
+  }),
+  watch: {
+    slides: function slides(e) {
+      var id = 0;
+      this.slideNumbers = e.map(function (slide, i) {
+        if (!slide.disabled) {
+          id++;
+          return id;
+        }
+      });
+    }
+  },
+  mounted: function mounted() {
+    var lessonId = this.$route.params.id;
+
+    if (lessonId) {
+      this.editMode = true;
+      this.lessonId = lessonId;
+      this.fetchLesson();
+    }
+  },
   methods: {
-    handleSubmit: function handleSubmit() {
+    fetchLesson: function fetchLesson() {
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-        var config, res, lessonId, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _value, slide;
+        var res, lesson, _res;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (!(_this.slides.length > 0)) {
-                  _context.next = 46;
+                _context.next = 2;
+                return axios.get("/lessons/" + _this.$route.params.id);
+
+              case 2:
+                res = _context.sent;
+                lesson = res.data;
+                _this.lessonTitle = lesson.title;
+                _this.lessonDescription = lesson.description;
+
+                if (!lesson) {
+                  _context.next = 11;
                   break;
                 }
 
-                if (!(!_this.lessonTitle || !_this.lessonDescription || _this.slides.find(function (slide) {
+                _context.next = 9;
+                return axios.get("/slides?lesson_id=" + _this.lessonId);
+
+              case 9:
+                _res = _context.sent;
+                _this.slides = _res.data;
+
+              case 11:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
+    },
+    handleSubmit: function handleSubmit() {
+      var _this2 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+        var config, url, method, res, lessonId, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _value, slide;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                if (!(_this2.enabledSlides.length > 0)) {
+                  _context2.next = 51;
+                  break;
+                }
+
+                if (!(!_this2.lessonTitle || !_this2.lessonDescription || _this2.enabledSlides.find(function (slide) {
                   return !slide.title || !slide.content;
                 }))) {
-                  _context.next = 3;
+                  _context2.next = 3;
                   break;
                 }
 
-                return _context.abrupt("return", Vue.$toast.error("Please fill up all the fields"));
+                return _context2.abrupt("return", Vue.$toast.error("Please fill up all the fields"));
 
               case 3:
                 config = {
                   headers: {
                     Authorization: "Bearer ".concat(window.localStorage.getItem("access_token"))
                   }
-                }; // first create the lesson...
+                }; // first create/update the lesson...
 
-                _context.next = 6;
-                return axios.post("/lessons", {
-                  user_id: _this.user.id,
-                  title: _this.lessonTitle,
-                  description: _this.lessonDescription
+                url = "/lessons";
+                method = "post";
+
+                if (_this2.editMode) {
+                  method = "patch";
+                  url = "/lessons/" + _this2.lessonId;
+                }
+
+                _context2.next = 9;
+                return axios[method](url, {
+                  user_id: _this2.user.id,
+                  title: _this2.lessonTitle,
+                  description: _this2.lessonDescription
                 }, config);
 
-              case 6:
-                res = _context.sent;
-                lessonId = res.data.id; // add slides one by one...
+              case 9:
+                res = _context2.sent;
+                lessonId = res.data.id;
+
+                if (_this2.editMode) {
+                  lessonId = _this2.lessonId;
+                } // add slides one by one...
+
 
                 _iteratorNormalCompletion = true;
                 _didIteratorError = false;
-                _context.prev = 10;
-                _iterator = _asyncIterator(_this.slides);
+                _context2.prev = 14;
+                _iterator = _asyncIterator(_this2.enabledSlides);
 
-              case 12:
-                _context.next = 14;
+              case 16:
+                _context2.next = 18;
                 return _iterator.next();
 
-              case 14:
-                _step = _context.sent;
+              case 18:
+                _step = _context2.sent;
                 _iteratorNormalCompletion = _step.done;
-                _context.next = 18;
+                _context2.next = 22;
                 return _step.value;
 
-              case 18:
-                _value = _context.sent;
+              case 22:
+                _value = _context2.sent;
 
                 if (_iteratorNormalCompletion) {
-                  _context.next = 26;
+                  _context2.next = 31;
                   break;
                 }
 
                 slide = _value;
-                _context.next = 23;
-                return axios.post("/slides", {
+
+                if (_this2.editMode && slide.id) {
+                  method = "patch";
+                  url = "/slides/" + slide.id;
+                } else {
+                  method = "post";
+                  url = "/slides";
+                }
+
+                _context2.next = 28;
+                return axios[method](url, {
                   lesson_id: lessonId,
                   title: slide.title,
                   content: slide.content
                 }, config);
 
-              case 23:
-                _iteratorNormalCompletion = true;
-                _context.next = 12;
-                break;
-
-              case 26:
-                _context.next = 32;
-                break;
-
               case 28:
-                _context.prev = 28;
-                _context.t0 = _context["catch"](10);
-                _didIteratorError = true;
-                _iteratorError = _context.t0;
+                _iteratorNormalCompletion = true;
+                _context2.next = 16;
+                break;
 
-              case 32:
-                _context.prev = 32;
-                _context.prev = 33;
+              case 31:
+                _context2.next = 37;
+                break;
+
+              case 33:
+                _context2.prev = 33;
+                _context2.t0 = _context2["catch"](14);
+                _didIteratorError = true;
+                _iteratorError = _context2.t0;
+
+              case 37:
+                _context2.prev = 37;
+                _context2.prev = 38;
 
                 if (!(!_iteratorNormalCompletion && _iterator["return"] != null)) {
-                  _context.next = 37;
+                  _context2.next = 42;
                   break;
                 }
 
-                _context.next = 37;
+                _context2.next = 42;
                 return _iterator["return"]();
 
-              case 37:
-                _context.prev = 37;
+              case 42:
+                _context2.prev = 42;
 
                 if (!_didIteratorError) {
-                  _context.next = 40;
+                  _context2.next = 45;
                   break;
                 }
 
                 throw _iteratorError;
 
-              case 40:
-                return _context.finish(37);
+              case 45:
+                return _context2.finish(42);
 
-              case 41:
-                return _context.finish(32);
+              case 46:
+                return _context2.finish(37);
 
-              case 42:
+              case 47:
                 Vue.$toast.success("Lesson created successfully!");
 
-                _this.$router.push({
+                _this2.$router.push({
                   name: "home"
                 });
 
-                _context.next = 47;
+                _context2.next = 52;
                 break;
 
-              case 46:
+              case 51:
                 Vue.$toast.error("Please add at least 1 slide");
 
-              case 47:
+              case 52:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, null, [[10, 28, 32, 42], [33,, 37, 41]]);
+        }, _callee2, null, [[14, 33, 37, 47], [38,, 42, 46]]);
       }))();
     },
-    addSlide: function addSlide(id) {
+    addSlide: function addSlide() {
       this.slides.push({
+        // id: this.randomNumbers(),
+        uuid: (0,uuid__WEBPACK_IMPORTED_MODULE_5__.default)(),
         title: "",
-        content: ""
+        content: "",
+        noDefaultHtml: true
       });
+    },
+    removeSlide: function removeSlide(id) {
+      console.log("id of slide to remove", id, this.slides);
+      this.slides = this.slides.map(function (slide) {
+        if (slide.id === id || slide.uuid === id) {
+          slide.disabled = true;
+        }
+
+        return slide;
+      });
+    },
+    getSlideNumber: function getSlideNumber(i) {
+      return this.slideNumbers[i];
+    },
+    randomNumbers: function randomNumbers() {
+      var length = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
+      var rand = "";
+
+      for (var i = 0; i < length; i++) {
+        rand += Math.random() >= 0.5 ? "1" : "0";
+      }
+
+      return Number(rand);
     }
   }
 });
@@ -3208,6 +3512,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _components_SlideList__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/SlideList */ "./resources/js/components/SlideList.vue");
 /* harmony import */ var _components_FavoriteButton__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/FavoriteButton */ "./resources/js/components/FavoriteButton.vue");
+/* harmony import */ var _components_Button_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/Button.vue */ "./resources/js/components/Button.vue");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -3239,12 +3544,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     SlideList: _components_SlideList__WEBPACK_IMPORTED_MODULE_1__.default,
-    FavoriteButton: _components_FavoriteButton__WEBPACK_IMPORTED_MODULE_2__.default
+    FavoriteButton: _components_FavoriteButton__WEBPACK_IMPORTED_MODULE_2__.default,
+    Button: _components_Button_vue__WEBPACK_IMPORTED_MODULE_3__.default
   },
   data: function data() {
     return {
@@ -3294,6 +3602,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }, _callee2);
       }))();
+    },
+    presentSlide: function presentSlide() {
+      this.$refs.slideList.enableFullScreen();
     }
   }
 });
@@ -3642,6 +3953,17 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js"
 
 (axios__WEBPACK_IMPORTED_MODULE_4___default().defaults.baseURL) = "http://localhost:8000/api";
 (axios__WEBPACK_IMPORTED_MODULE_4___default().defaults.homeURL) = "http://localhost:8000/";
+axios__WEBPACK_IMPORTED_MODULE_4___default().interceptors.request.use(function (config) {
+  var token = localStorage.getItem("access_token");
+
+  if (!config.headers.Authorization) {
+    config.headers.Authorization = "Bearer ".concat(token);
+  }
+
+  return config;
+}, function (err) {
+  return Promise.reject(err);
+});
 Vue.use((vue_toast_notification__WEBPACK_IMPORTED_MODULE_2___default()), {
   position: "top"
 });
@@ -3775,7 +4097,11 @@ var routes = [{
   component: _pages_Lesson__WEBPACK_IMPORTED_MODULE_4__.default
 }, {
   path: "/create",
-  name: "create",
+  name: "create_lesson",
+  component: _pages_CreateLesson__WEBPACK_IMPORTED_MODULE_5__.default
+}, {
+  path: "/edit/:id",
+  name: "edit_lesson",
   component: _pages_CreateLesson__WEBPACK_IMPORTED_MODULE_5__.default
 }, {
   path: "/favorites",
@@ -8596,7 +8922,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".lesson-card[data-v-29eb0dda] {\n  background: white;\n  padding: 50px;\n  margin-bottom: 20px;\n  transition: 0.2s;\n  border: 1px solid white;\n}\n.lesson-card[data-v-29eb0dda]:hover {\n  border: 1px solid dodgerblue;\n  background: #e1e6f7;\n}\n.lesson-card .lesson-title[data-v-29eb0dda] {\n  font-size: 2em;\n}\n.lesson-card .lesson-description[data-v-29eb0dda] {\n  margin: 10px 0;\n  margin-bottom: 20px;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".lesson-card[data-v-29eb0dda] {\n  background: white;\n  padding: 50px;\n  margin-bottom: 20px;\n  transition: 0.2s;\n  border: 1px solid white;\n}\n.lesson-card[data-v-29eb0dda]:hover {\n  border: 1px solid dodgerblue;\n  background: #e1e6f7;\n}\n.lesson-card .lesson-title[data-v-29eb0dda] {\n  font-size: 2em;\n  text-decoration: none;\n  color: #333;\n}\n.lesson-card .lesson-title[data-v-29eb0dda]:hover {\n  color: #426eff;\n}\n.lesson-card .lesson-description[data-v-29eb0dda] {\n  margin: 10px 0;\n  margin-bottom: 20px;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -8620,7 +8946,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".lesson-title[data-v-0046e3c0] {\n  font-size: 2em;\n  margin: 20px 0;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".lesson-title[data-v-0046e3c0] {\n  font-size: 2em;\n  margin: 20px 0;\n}\n.page-info[data-v-0046e3c0] {\n  margin-bottom: 15px;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -8692,7 +9018,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".slide-list[data-v-39d586d8] {\n  display: flex;\n  height: 100%;\n  flex-direction: column;\n}\n.slide-list .slide-view[data-v-39d586d8] {\n  flex: 1;\n  position: relative;\n}\n.slide-list .slide-view .left-arrow[data-v-39d586d8],\n.slide-list .slide-view .right-arrow[data-v-39d586d8] {\n  width: 50px;\n  height: 50px;\n  background: #63b663;\n  padding: 10px;\n  position: absolute;\n  font-size: 1.5em;\n  font-weight: bold;\n  color: #d6f0b9;\n  top: 50%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  transition: 0.3s;\n  border: 2px solid transparent;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n}\n.slide-list .slide-view .left-arrow.disabled[data-v-39d586d8],\n.slide-list .slide-view .right-arrow.disabled[data-v-39d586d8] {\n  opacity: 0.5;\n}\n.slide-list .slide-view .left-arrow[data-v-39d586d8]:hover,\n.slide-list .slide-view .right-arrow[data-v-39d586d8]:hover {\n  background: white;\n  cursor: pointer;\n  color: green;\n  border: 2px solid green;\n}\n.slide-list .slide-view .left-arrow[data-v-39d586d8] {\n  left: 0;\n  transform: translate(-45%, -50%);\n}\n.slide-list .slide-view .right-arrow[data-v-39d586d8] {\n  right: 0;\n  transform: translate(45%, -50%);\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".slide-list[data-v-39d586d8] {\n  display: flex;\n  height: 100%;\n  flex-direction: column;\n}\n.slide-list .slide-view[data-v-39d586d8] {\n  flex: 1;\n  position: relative;\n}\n.slide-list .slide-view .close[data-v-39d586d8] {\n  position: absolute;\n  right: 25px;\n  top: 15px;\n  font-size: 2em;\n}\n.slide-list .slide-view .left-arrow[data-v-39d586d8],\n.slide-list .slide-view .right-arrow[data-v-39d586d8] {\n  width: 50px;\n  height: 50px;\n  background: #63b663;\n  padding: 10px;\n  position: absolute;\n  font-size: 1.5em;\n  font-weight: bold;\n  color: #d6f0b9;\n  top: 50%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  transition: 0.3s;\n  border: 2px solid transparent;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n}\n.slide-list .slide-view .left-arrow.disabled[data-v-39d586d8],\n.slide-list .slide-view .right-arrow.disabled[data-v-39d586d8] {\n  opacity: 0.5;\n}\n.slide-list .slide-view .left-arrow[data-v-39d586d8]:hover,\n.slide-list .slide-view .right-arrow[data-v-39d586d8]:hover {\n  background: white;\n  cursor: pointer;\n  color: green;\n  border: 2px solid green;\n}\n.slide-list .slide-view .left-arrow[data-v-39d586d8] {\n  left: 0;\n  transform: translate(-45%, -50%);\n}\n.slide-list .slide-view .right-arrow[data-v-39d586d8] {\n  right: 0;\n  transform: translate(45%, -50%);\n}\n.slide-list.fullScreenMode .slide-view[data-v-39d586d8] {\n  flex: 1;\n  position: relative;\n}\n.slide-list.fullScreenMode .slide-view .left-arrow[data-v-39d586d8] {\n  left: 0;\n  transform: translate(5%, -50%);\n}\n.slide-list.fullScreenMode .slide-view .right-arrow[data-v-39d586d8] {\n  right: 0;\n  transform: translate(-5%, -50%);\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -8716,7 +9042,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".slides-main-title[data-v-04d36d5d] {\n  margin-top: 35px;\n  margin-bottom: 15px;\n  text-align: center;\n  font-size: 1.2em;\n  background: #5b90f3;\n  color: white;\n  padding: 10px;\n  border-bottom: 1px solid #ccc;\n}\n.slide-form[data-v-04d36d5d] {\n  margin: 15px 0;\n  margin-bottom: 25px;\n  background: #d8e5fe;\n  padding: 15px 10px;\n}\n.slide-form .slide-form-title[data-v-04d36d5d] {\n  font-size: 1.2em;\n  text-align: center;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".slides-main-title[data-v-04d36d5d] {\n  margin-top: 35px;\n  margin-bottom: 15px;\n  text-align: center;\n  font-size: 1.2em;\n  background: #5b90f3;\n  color: white;\n  padding: 10px;\n  border-bottom: 1px solid #ccc;\n}\n.slide-form[data-v-04d36d5d] {\n  margin: 15px 0;\n  margin-bottom: 25px;\n  background: #d8e5fe;\n  padding: 15px 10px;\n  position: relative;\n}\n.slide-form .slide-form-title[data-v-04d36d5d] {\n  font-size: 1.2em;\n  text-align: center;\n}\n.slide-form .close[data-v-04d36d5d] {\n  position: absolute;\n  right: 20px;\n  top: 20px;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -41360,6 +41686,161 @@ module.exports = function (list, options) {
 
 /***/ }),
 
+/***/ "./node_modules/uuid/dist/esm-browser/regex.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/uuid/dist/esm-browser/regex.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i);
+
+/***/ }),
+
+/***/ "./node_modules/uuid/dist/esm-browser/rng.js":
+/*!***************************************************!*\
+  !*** ./node_modules/uuid/dist/esm-browser/rng.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ rng)
+/* harmony export */ });
+// Unique ID creation requires a high quality random # generator. In the browser we therefore
+// require the crypto API and do not support built-in fallback to lower quality random number
+// generators (like Math.random()).
+var getRandomValues;
+var rnds8 = new Uint8Array(16);
+function rng() {
+  // lazy load so that environments that need to polyfill have a chance to do so
+  if (!getRandomValues) {
+    // getRandomValues needs to be invoked in a context where "this" is a Crypto implementation. Also,
+    // find the complete implementation of crypto (msCrypto) on IE11.
+    getRandomValues = typeof crypto !== 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto) || typeof msCrypto !== 'undefined' && typeof msCrypto.getRandomValues === 'function' && msCrypto.getRandomValues.bind(msCrypto);
+
+    if (!getRandomValues) {
+      throw new Error('crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported');
+    }
+  }
+
+  return getRandomValues(rnds8);
+}
+
+/***/ }),
+
+/***/ "./node_modules/uuid/dist/esm-browser/stringify.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/uuid/dist/esm-browser/stringify.js ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validate.js */ "./node_modules/uuid/dist/esm-browser/validate.js");
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+
+var byteToHex = [];
+
+for (var i = 0; i < 256; ++i) {
+  byteToHex.push((i + 0x100).toString(16).substr(1));
+}
+
+function stringify(arr) {
+  var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  // Note: Be careful editing this code!  It's been tuned for performance
+  // and works in ways you may not expect. See https://github.com/uuidjs/uuid/pull/434
+  var uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase(); // Consistency check for valid UUID.  If this throws, it's likely due to one
+  // of the following:
+  // - One or more input array values don't map to a hex octet (leading to
+  // "undefined" in the uuid)
+  // - Invalid input values for the RFC `version` or `variant` fields
+
+  if (!(0,_validate_js__WEBPACK_IMPORTED_MODULE_0__.default)(uuid)) {
+    throw TypeError('Stringified UUID is invalid');
+  }
+
+  return uuid;
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (stringify);
+
+/***/ }),
+
+/***/ "./node_modules/uuid/dist/esm-browser/v4.js":
+/*!**************************************************!*\
+  !*** ./node_modules/uuid/dist/esm-browser/v4.js ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _rng_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./rng.js */ "./node_modules/uuid/dist/esm-browser/rng.js");
+/* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./stringify.js */ "./node_modules/uuid/dist/esm-browser/stringify.js");
+
+
+
+function v4(options, buf, offset) {
+  options = options || {};
+  var rnds = options.random || (options.rng || _rng_js__WEBPACK_IMPORTED_MODULE_0__.default)(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+
+  rnds[6] = rnds[6] & 0x0f | 0x40;
+  rnds[8] = rnds[8] & 0x3f | 0x80; // Copy bytes to buffer, if provided
+
+  if (buf) {
+    offset = offset || 0;
+
+    for (var i = 0; i < 16; ++i) {
+      buf[offset + i] = rnds[i];
+    }
+
+    return buf;
+  }
+
+  return (0,_stringify_js__WEBPACK_IMPORTED_MODULE_1__.default)(rnds);
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (v4);
+
+/***/ }),
+
+/***/ "./node_modules/uuid/dist/esm-browser/validate.js":
+/*!********************************************************!*\
+  !*** ./node_modules/uuid/dist/esm-browser/validate.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _regex_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./regex.js */ "./node_modules/uuid/dist/esm-browser/regex.js");
+
+
+function validate(uuid) {
+  return typeof uuid === 'string' && _regex_js__WEBPACK_IMPORTED_MODULE_0__.default.test(uuid);
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (validate);
+
+/***/ }),
+
 /***/ "./resources/js/components/App.vue":
 /*!*****************************************!*\
   !*** ./resources/js/components/App.vue ***!
@@ -43438,7 +43919,7 @@ var render = function() {
               },
               on: {
                 click: function($event) {
-                  return _vm.$router.push({ name: "create" })
+                  return _vm.$router.push({ name: "create_lesson" })
                 }
               }
             })
@@ -43490,6 +43971,14 @@ var render = function() {
               _vm._v(_vm._s(_vm.label))
             ]),
             _vm._v(" "),
+            _vm.useDefaultHtml
+              ? _c("div", {
+                  staticClass: "editor",
+                  attrs: { id: "editor-" + _vm.index },
+                  domProps: { innerHTML: _vm._s(_vm.value) }
+                })
+              : _vm._e(),
+            _vm._v(" "),
             _c("div", {
               staticClass: "editor",
               attrs: { id: "editor-" + _vm.index }
@@ -43501,6 +43990,7 @@ var render = function() {
               ? _c("textarea", {
                   staticClass: "textarea-input",
                   attrs: { rows: "5" },
+                  domProps: { value: _vm.value },
                   on: {
                     input: function($event) {
                       return _vm.$emit("valueChange", $event.target.value)
@@ -43549,9 +44039,14 @@ var render = function() {
     "div",
     { staticClass: "lesson-card" },
     [
-      _c("div", { staticClass: "lesson-title" }, [
-        _vm._v(_vm._s(_vm.lesson.title))
-      ]),
+      _c(
+        "router-link",
+        {
+          staticClass: "lesson-title",
+          attrs: { to: { name: "lesson", params: { id: _vm.lesson.id } } }
+        },
+        [_vm._v(_vm._s(_vm.lesson.title))]
+      ),
       _vm._v(" "),
       _c("div", { staticClass: "lesson-description" }, [
         _vm._v("\n        " + _vm._s(_vm.lesson.description) + "\n    ")
@@ -43569,6 +44064,21 @@ var render = function() {
           }
         }
       }),
+      _vm._v(" "),
+      _vm.showEdit
+        ? _c("Button", {
+            staticStyle: { "margin-right": "10px" },
+            attrs: { title: "Edit Lesson", icon: "fas fa-edit", inverted: "" },
+            on: {
+              click: function($event) {
+                return _vm.$router.push({
+                  name: "edit_lesson",
+                  params: { id: _vm.lesson.id }
+                })
+              }
+            }
+          })
+        : _vm._e(),
       _vm._v(" "),
       _vm.showDelete
         ? _c("Button", {
@@ -43592,7 +44102,7 @@ var render = function() {
         attrs: { lessonId: _vm.lesson.id },
         on: {
           removeLesson: function($event) {
-            return _vm.$emit("removeLesson")
+            return _vm.$emit("updateLessons")
           }
         }
       })
@@ -43628,13 +44138,48 @@ var render = function() {
     [
       _c("div", { staticClass: "lesson-title" }, [_vm._v(_vm._s(_vm.title))]),
       _vm._v(" "),
+      _vm.totalPages > 1
+        ? _c("div", { staticClass: "page-info" }, [
+            _vm._v(
+              "\n        Page " +
+                _vm._s(_vm.page) +
+                " of " +
+                _vm._s(_vm.totalPages) +
+                "\n    "
+            )
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      !_vm.isLoading && !_vm.lessons.length
+        ? [
+            _vm.myLessons
+              ? _c("div", [
+                  _vm._v(
+                    "\n            You have not created any lessons yet.\n        "
+                  )
+                ])
+              : _vm.favorites
+              ? _c("div", [
+                  _vm._v(
+                    "\n            You have not marked any lesson as favorite.\n        "
+                  )
+                ])
+              : _vm._e()
+          ]
+        : _vm._e(),
+      _vm._v(" "),
       _vm._l(_vm.lessons, function(lesson, i) {
         return _c(
           "div",
           { key: i },
           [
             _c("LessonCard", {
-              attrs: { lesson: lesson, showDelete: _vm.myLessons }
+              attrs: {
+                lesson: lesson,
+                showDelete: _vm.myLessons,
+                showEdit: _vm.myLessons
+              },
+              on: { updateLessons: _vm.updateLessons }
             })
           ],
           1
@@ -43676,7 +44221,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm.totalPages
+  return _vm.totalPages > 1
     ? _c(
         "div",
         { staticClass: "paginator" },
@@ -43787,57 +44332,79 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "slide-list" }, [
-    _c(
-      "div",
-      { staticClass: "slide-view" },
-      [
-        _c("Slide", {
-          attrs: {
-            title: _vm.currentSlide.title,
-            content: _vm.currentSlide.content,
-            number: _vm.index + 1,
-            totalSlides: _vm.slides.length,
-            showIndex: _vm.slides.length > 1
-          }
-        }),
-        _vm._v(" "),
-        _vm.slides.length > 1
-          ? [
-              _c(
-                "div",
+  return _c(
+    "div",
+    {
+      ref: "slideList",
+      class: ["slide-list", { fullScreenMode: _vm.fullScreenMode }]
+    },
+    [
+      _c(
+        "div",
+        { staticClass: "slide-view" },
+        [
+          _c("Slide", {
+            attrs: {
+              title: _vm.currentSlide.title,
+              content: _vm.currentSlide.content,
+              number: _vm.index + 1,
+              totalSlides: _vm.slides.length,
+              showIndex: _vm.slides.length > 1
+            }
+          }),
+          _vm._v(" "),
+          _vm.fullScreenMode
+            ? _c(
+                "button",
                 {
-                  class: ["left-arrow", { disabled: _vm.index === 0 }],
+                  staticClass: "close",
                   on: {
                     click: function($event) {
-                      return _vm.updateIndex(_vm.index - 1)
+                      return _vm.exitFullScreen()
                     }
                   }
                 },
-                [_c("i", { staticClass: "fas fa-chevron-left" })]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  class: [
-                    "right-arrow",
-                    { disabled: _vm.index === _vm.slides.length - 1 }
-                  ],
-                  on: {
-                    click: function($event) {
-                      return _vm.updateIndex(_vm.index + 1)
-                    }
-                  }
-                },
-                [_c("i", { staticClass: "fas fa-chevron-right" })]
+                [_vm._v("\n            ×\n        ")]
               )
-            ]
-          : _vm._e()
-      ],
-      2
-    )
-  ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.slides.length > 1
+            ? [
+                _c(
+                  "div",
+                  {
+                    class: ["left-arrow", { disabled: _vm.index === 0 }],
+                    on: {
+                      click: function($event) {
+                        return _vm.updateIndex(_vm.index - 1)
+                      }
+                    }
+                  },
+                  [_c("i", { staticClass: "fas fa-chevron-left" })]
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    class: [
+                      "right-arrow",
+                      { disabled: _vm.index === _vm.slides.length - 1 }
+                    ],
+                    on: {
+                      click: function($event) {
+                        return _vm.updateIndex(_vm.index + 1)
+                      }
+                    }
+                  },
+                  [_c("i", { staticClass: "fas fa-chevron-right" })]
+                )
+              ]
+            : _vm._e()
+        ],
+        2
+      )
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -43869,7 +44436,7 @@ var render = function() {
       _c(
         "Form",
         {
-          attrs: { title: "Create new Lesson" },
+          attrs: { title: _vm.editMode ? "Edit Lesson" : "Create new Lesson" },
           on: { submit: _vm.handleSubmit }
         },
         [
@@ -43895,45 +44462,77 @@ var render = function() {
             }
           }),
           _vm._v(" "),
-          _vm.slides.length
+          _vm.enabledSlides.length
             ? _c("div", { staticClass: "slides-main-title" }, [
                 _vm._v("\n            SLIDES TO SHOW\n        ")
               ])
             : _vm._e(),
           _vm._v(" "),
           _vm._l(_vm.slides, function(slide, i) {
-            return _c(
-              "div",
-              { key: i, staticClass: "slide-form" },
-              [
-                _c("div", { staticClass: "slide-form-title" }, [
-                  _vm._v("Slide " + _vm._s(i + 1))
-                ]),
-                _vm._v(" "),
-                _c("Input", {
-                  attrs: { label: "Slide Tilte", type: "text" },
-                  model: {
-                    value: slide.title,
-                    callback: function($$v) {
-                      _vm.$set(slide, "title", $$v)
-                    },
-                    expression: "slide.title"
-                  }
-                }),
-                _vm._v(" "),
-                _c("Input", {
-                  attrs: { label: "Slide Content", type: "editor", index: i },
-                  model: {
-                    value: slide.content,
-                    callback: function($$v) {
-                      _vm.$set(slide, "content", $$v)
-                    },
-                    expression: "slide.content"
-                  }
-                })
-              ],
-              1
-            )
+            return [
+              !slide.disabled
+                ? _c("div", { key: i, staticClass: "slide-form" }, [
+                    _c(
+                      "div",
+                      [
+                        _c("div", { staticClass: "slide-form-title" }, [
+                          _vm._v(
+                            "\n                        Slide " +
+                              _vm._s(_vm.getSlideNumber(i)) +
+                              "\n                    "
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "close",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                return _vm.removeSlide(slide.uuid || slide.id)
+                              }
+                            }
+                          },
+                          [
+                            _vm._v(
+                              "\n                        ×\n                    "
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c("Input", {
+                          attrs: { label: "Slide Tilte", type: "text" },
+                          model: {
+                            value: slide.title,
+                            callback: function($$v) {
+                              _vm.$set(slide, "title", $$v)
+                            },
+                            expression: "slide.title"
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("Input", {
+                          attrs: {
+                            label: "Slide Content",
+                            type: "editor",
+                            index: slide.uuid || slide.id,
+                            useDefaultHtml: !slide.noDefaultHtml
+                          },
+                          model: {
+                            value: slide.content,
+                            callback: function($$v) {
+                              _vm.$set(slide, "content", $$v)
+                            },
+                            expression: "slide.content"
+                          }
+                        })
+                      ],
+                      1
+                    )
+                  ])
+                : _vm._e()
+            ]
           }),
           _vm._v(" "),
           _c("Button", {
@@ -43943,7 +44542,7 @@ var render = function() {
           _vm._v(" "),
           _c("Button", {
             staticStyle: { "margin-left": "10px" },
-            attrs: { title: "Create Lesson" }
+            attrs: { title: _vm.editMode ? "Save Lesson" : "Create Lesson" }
           })
         ],
         2
@@ -44030,45 +44629,62 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "lesson-container" }, [
-    _c("div", { staticClass: "lesson-info" }, [
-      _c("div", { staticClass: "lesson-title" }, [
-        _vm._v(_vm._s(_vm.lesson.title))
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "lesson-description" }, [
-        _vm._v("\n            " + _vm._s(_vm.lesson.description) + "\n        ")
-      ]),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "d-flex" },
-        [
-          _c("FavoriteButton", {
-            attrs: { lessonId: Number(_vm.$route.params.id) }
-          }),
-          _vm._v(" "),
-          _c("div", { staticStyle: { "margin-left": "20px" } }, [
-            _c("div", { staticClass: "lesson-date" }, [
-              _vm._v(
-                "\n                    Posted on\n                    " +
-                  _vm._s(new Date(_vm.lesson.created_at).toDateString()) +
-                  "\n                "
-              )
-            ]),
+    _c(
+      "div",
+      { staticClass: "lesson-info" },
+      [
+        _c("div", { staticClass: "lesson-title" }, [
+          _vm._v(_vm._s(_vm.lesson.title))
+        ]),
+        _vm._v(" "),
+        _c("Button", {
+          attrs: { title: "Present Slide" },
+          on: { click: _vm.presentSlide }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "lesson-description" }, [
+          _vm._v(
+            "\n            " + _vm._s(_vm.lesson.description) + "\n        "
+          )
+        ]),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "d-flex" },
+          [
+            _c("FavoriteButton", {
+              attrs: { lessonId: Number(_vm.$route.params.id) }
+            }),
             _vm._v(" "),
-            _c("div", { staticClass: "lesson-author" }, [
-              _vm._v("By " + _vm._s(_vm.lesson.user.name))
+            _c("div", { staticStyle: { "margin-left": "20px" } }, [
+              _c("div", { staticClass: "lesson-date" }, [
+                _vm._v(
+                  "\n                    Posted on\n                    " +
+                    _vm._s(new Date(_vm.lesson.created_at).toDateString()) +
+                    "\n                "
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "lesson-author" }, [
+                _vm._v("By " + _vm._s(_vm.lesson.user.name))
+              ])
             ])
-          ])
-        ],
-        1
-      )
-    ]),
+          ],
+          1
+        )
+      ],
+      1
+    ),
     _vm._v(" "),
     _c(
       "div",
       { staticClass: "lesson-view" },
-      [_c("SlideList", { attrs: { lessonId: Number(_vm.$route.params.id) } })],
+      [
+        _c("SlideList", {
+          ref: "slideList",
+          attrs: { lessonId: Number(_vm.$route.params.id) }
+        })
+      ],
       1
     )
   ])

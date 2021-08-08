@@ -1,6 +1,10 @@
 <template>
     <div class="lesson-card">
-        <div class="lesson-title">{{ lesson.title }}</div>
+        <router-link
+            class="lesson-title"
+            :to="{ name: 'lesson', params: { id: lesson.id } }"
+            >{{ lesson.title }}</router-link
+        >
         <div class="lesson-description">
             {{ lesson.description }}
         </div>
@@ -11,6 +15,16 @@
             style="margin-right: 10px;"
         />
         <Button
+            title="Edit Lesson"
+            icon="fas fa-edit"
+            v-if="showEdit"
+            @click="
+                $router.push({ name: 'edit_lesson', params: { id: lesson.id } })
+            "
+            style="margin-right: 10px;"
+            inverted
+        />
+        <Button
             icon="fas fa-trash"
             v-if="showDelete"
             style="min-width: 50px; background: red; color: white; margin-right: 10px; border-color: red;"
@@ -18,7 +32,7 @@
         />
         <FavoriteButton
             :lessonId="lesson.id"
-            @removeLesson="$emit('removeLesson')"
+            @removeLesson="$emit('updateLessons')"
         />
     </div>
 </template>
@@ -31,7 +45,8 @@ export default {
     components: { Button, FavoriteButton },
     props: {
         lesson: { type: Object, default: () => ({}) },
-        showDelete: { type: Boolean, default: false }
+        showDelete: { type: Boolean, default: false },
+        showEdit: { type: Boolean, default: false }
     },
     methods: {
         async deleteLesson(lessonId) {
@@ -42,7 +57,7 @@ export default {
                 }
             });
             if (res.data.success) {
-                this.$emit("removeLesson");
+                this.$emit("updateLessons");
                 Vue.$toast.success("Lesson deleted successfully.");
             } else {
                 Vue.$toast.error("Please enter");
@@ -67,6 +82,12 @@ export default {
 
     .lesson-title {
         font-size: 2em;
+        text-decoration: none;
+        color: #333;
+
+        &:hover {
+            color: rgb(66, 110, 255);
+        }
     }
 
     .lesson-description {

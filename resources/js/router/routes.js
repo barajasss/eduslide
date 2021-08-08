@@ -35,7 +35,12 @@ const routes = [
     },
     {
         path: "/create",
-        name: "create",
+        name: "create_lesson",
+        component: CreateLesson
+    },
+    {
+        path: "/edit/:id",
+        name: "edit_lesson",
         component: CreateLesson
     },
     {

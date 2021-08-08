@@ -2,6 +2,12 @@
     <div :class="['input-container']">
         <template v-if="type === 'editor'">
             <div class="editor-title">{{ label }}</div>
+            <div
+                :id="`editor-${index}`"
+                class="editor"
+                v-if="useDefaultHtml"
+                v-html="value"
+            ></div>
             <div :id="`editor-${index}`" class="editor"></div>
         </template>
         <label v-else>
@@ -10,6 +16,7 @@
                 class="textarea-input"
                 v-if="type === 'textarea'"
                 rows="5"
+                :value="value"
                 @input="$emit('valueChange', $event.target.value)"
             >
             </textarea>
@@ -34,7 +41,8 @@ export default {
         value: { type: String },
         label: { type: String },
         type: { type: String, default: "text" },
-        index: { type: Number }
+        index: { type: [Number, String] },
+        useDefaultHtml: { type: Boolean, default: false }
     },
     mounted() {
         if (this.type === "editor") {

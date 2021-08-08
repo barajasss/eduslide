@@ -8,7 +8,7 @@
 <script>
 export default {
     props: {
-        title: { type: String, default: "" },
+        title: { type: [Number, String], default: "" },
         inverted: { type: Boolean, default: false },
         icon: { type: String, default: "" }
     },

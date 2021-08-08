@@ -1,5 +1,5 @@
 <template>
-    <div class="slide-list">
+    <div :class="['slide-list', { fullScreenMode }]" ref="slideList">
         <div class="slide-view">
             <Slide
                 :title="currentSlide.title"
@@ -8,6 +8,13 @@
                 :totalSlides="slides.length"
                 :showIndex="slides.length > 1"
             />
+            <button
+                class="close"
+                v-if="fullScreenMode"
+                @click="exitFullScreen()"
+            >
+                &times;
+            </button>
             <template v-if="slides.length > 1">
                 <div
                     :class="['left-arrow', { disabled: index === 0 }]"
@@ -43,13 +50,16 @@ export default {
             currentSlide: {
                 title: "",
                 content: ""
-            }
+            },
+            fullScreenMode: false
         };
     },
     async mounted() {
         await this.getSlides(this.lessonId);
         this.index = 0;
         this.currentSlide = this.slides[this.index];
+        document.addEventListener("keydown", this.handleKeyDown);
+        document.addEventListener("fullscreenchange", this.handleFullScreen);
     },
     watch: {
         index(e) {
@@ -64,6 +74,42 @@ export default {
         updateIndex(index) {
             if (index >= 0 && index < this.slides.length) {
                 this.index = index;
+            }
+        },
+        handleKeyDown(e) {
+            switch (e.key) {
+                case "ArrowLeft": {
+                    this.updateIndex(this.index - 1);
+                    break;
+                }
+                case "ArrowRight": {
+                    this.updateIndex(this.index + 1);
+                    break;
+                }
+                case "f": {
+                    if (document.fullscreenElement) {
+                        this.exitFullScreen();
+                    } else {
+                        this.enableFullScreen();
+                    }
+                    break;
+                }
+            }
+        },
+        enableFullScreen() {
+            const el = this.$refs.slideList;
+            if (el.requestFullscreen) {
+                el.requestFullscreen();
+            }
+        },
+        exitFullScreen() {
+            document.exitFullscreen();
+        },
+        handleFullScreen() {
+            if (document.fullscreenElement) {
+                this.fullScreenMode = true;
+            } else {
+                this.fullScreenMode = false;
             }
         }
     }
@@ -80,6 +126,12 @@ export default {
         flex: 1;
         position: relative;
 
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 15px;
+            font-size: 2em;
+        }
         .left-arrow,
         .right-arrow {
             width: 50px;
@@ -117,6 +169,22 @@ export default {
         .right-arrow {
             right: 0;
             transform: translate(45%, -50%);
+        }
+    }
+}
+
+.slide-list.fullScreenMode {
+    .slide-view {
+        flex: 1;
+        position: relative;
+
+        .left-arrow {
+            left: 0;
+            transform: translate(5%, -50%);
+        }
+        .right-arrow {
+            right: 0;
+            transform: translate(-5%, -50%);
         }
     }
 }
