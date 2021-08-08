@@ -22,14 +22,23 @@ class LessonController extends Controller
     {
         if ($request->has('favorites') && $request->boolean('favorites')) {
             $favoriteIds = Favorite::where('user_id', auth()->user()->id)->pluck('lesson_id')->toArray();
-            $lessons = Lesson::with('user')->whereIn('id', $favoriteIds)->latest()->get();
+            $lessons = Lesson::with('user')->whereIn('id', $favoriteIds)->latest()->get()->toArray();
         } else if ($request->has('my_lessons') && $request->boolean('my_lessons')) {
-            $lessons = Lesson::with('user')->where('user_id', auth()->user()->id)->latest()->get();
+            $lessons = Lesson::with('user')->where('user_id', auth()->user()->id)->latest()->get()->toArray();
         } else {
-            $lessons = Lesson::with('user')->latest()->get();
+            $lessons = Lesson::with('user')->latest()->get()->toArray();
         }
+
+        // paginate data
+
+        if ($request->has('page')) {
+            $page = $request->input('page');
+            $limit = $request->input('limit', 10);
+            $paginatedLessons = array_slice($lessons, ($page - 1) * $limit, $limit);
+        }
+
         if (!is_null($lessons)) {
-            return $lessons;
+            return ['lessons' => $paginatedLessons, 'totalResults' => count($lessons)];
         }
         return ['success' => false];
     }

@@ -46,9 +46,12 @@ export default {
     },
     watch: {
         page(e) {
-            // this.$router.push({
-            //     name:
-            // })
+            this.$router.push({
+                name: this.$route.name,
+                query: {
+                    page: e
+                }
+            });
         }
     },
     methods: {

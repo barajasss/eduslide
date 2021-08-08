@@ -2544,6 +2544,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -2560,7 +2561,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       lessons: [],
-      page: 1
+      page: 1,
+      itemsPerPage: 3,
+      totalResults: 0
     };
   },
   components: {
@@ -2575,16 +2578,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              if (_this.$route.query.page) {
+                _this.page = Number(_this.$route.query.page);
+              }
+
+              if (!(_this.page === 1)) {
+                _context.next = 4;
+                break;
+              }
+
+              _context.next = 4;
               return _this.fetchLessons();
 
-            case 2:
+            case 4:
             case "end":
               return _context.stop();
           }
         }
       }, _callee);
     }))();
+  },
+  watch: {
+    page: function page(e) {
+      this.fetchLessons();
+    }
   },
   methods: {
     fetchLessons: function fetchLessons() {
@@ -2597,13 +2614,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return axios.get("/lessons");
+                return axios.get("/lessons?page=".concat(_this2.page, "&limit=").concat(_this2.itemsPerPage));
 
               case 2:
                 res = _context2.sent;
-                _this2.lessons = res.data;
+                _this2.lessons = res.data.lessons;
+                _this2.totalResults = res.data.totalResults;
 
-              case 4:
+              case 5:
               case "end":
                 return _context2.stop();
             }
@@ -2680,9 +2698,13 @@ __webpack_require__.r(__webpack_exports__);
     return {};
   },
   watch: {
-    page: function page(e) {// this.$router.push({
-      //     name:
-      // })
+    page: function page(e) {
+      this.$router.push({
+        name: this.$route.name,
+        query: {
+          page: e
+        }
+      });
     }
   },
   methods: {
@@ -43620,7 +43642,11 @@ var render = function() {
       }),
       _vm._v(" "),
       _c("Paginator", {
-        attrs: { totalResults: 30, page: _vm.page },
+        attrs: {
+          totalResults: _vm.totalResults,
+          page: _vm.page,
+          itemsPerPage: _vm.itemsPerPage
+        },
         on: { update: _vm.handlePaginatorUpdate }
       })
     ],

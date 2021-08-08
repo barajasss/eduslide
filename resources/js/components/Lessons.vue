@@ -5,8 +5,9 @@
             <LessonCard :lesson="lesson" :showDelete="myLessons" />
         </div>
         <Paginator
-            :totalResults="30"
+            :totalResults="totalResults"
             :page="page"
+            :itemsPerPage="itemsPerPage"
             @update="handlePaginatorUpdate"
         />
     </div>
@@ -27,17 +28,33 @@ export default {
     data() {
         return {
             lessons: [],
-            page: 1
+            page: 1,
+            itemsPerPage: 3,
+            totalResults: 0
         };
     },
     components: { LessonCard, Paginator },
     async mounted() {
-        await this.fetchLessons();
+        if (this.$route.query.page) {
+            this.page = Number(this.$route.query.page);
+        }
+
+        if (this.page === 1) {
+            await this.fetchLessons();
+        }
+    },
+    watch: {
+        page(e) {
+            this.fetchLessons();
+        }
     },
     methods: {
         async fetchLessons() {
-            const res = await axios.get("/lessons");
-            this.lessons = res.data;
+            const res = await axios.get(
+                `/lessons?page=${this.page}&limit=${this.itemsPerPage}`
+            );
+            this.lessons = res.data.lessons;
+            this.totalResults = res.data.totalResults;
         },
         handlePaginatorUpdate(data) {
             const { page } = data;
