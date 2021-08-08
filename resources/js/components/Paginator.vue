@@ -1,5 +1,5 @@
 <template>
-    <div class="paginator" v-if="totalPages">
+    <div class="paginator" v-if="totalPages > 1">
         <Button
             title="Prev"
             style="width: 100px; margin-right: 10px"
@@ -52,15 +52,36 @@ export default {
                     page: e
                 }
             });
+        },
+        totalResults(e) {
+            this.emitPageUpdate({
+                totalPages: this.totalPages
+            });
         }
+    },
+    mounted() {
+        let page = 1;
+
+        // read page from query if exists
+        if (this.$route.query.page) {
+            page = Number(this.$route.query.page);
+        }
+
+        this.emitPageUpdate({
+            page
+        });
     },
     methods: {
         updatePage(i) {
             if (i > 0 && i <= this.totalPages) {
-                this.$emit("update", {
-                    page: i
+                this.emitPageUpdate({
+                    page: i,
+                    totalPages: this.totalPages
                 });
             }
+        },
+        emitPageUpdate(data) {
+            this.$emit("update", data);
         }
     },
     computed: {

@@ -18,7 +18,7 @@
             <Button
                 title="Create a Lesson"
                 icon="fas fa-plus"
-                @click="$router.push({ name: 'create' })"
+                @click="$router.push({ name: 'create_lesson' })"
                 inverted
             />
         </template>

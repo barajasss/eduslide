@@ -2,6 +2,7 @@
     <div class="lesson-container">
         <div class="lesson-info">
             <div class="lesson-title">{{ lesson.title }}</div>
+            <Button title="Present Slide" @click="presentSlide" />
             <div class="lesson-description">
                 {{ lesson.description }}
             </div>
@@ -18,7 +19,7 @@
         </div>
 
         <div class="lesson-view">
-            <SlideList :lessonId="Number($route.params.id)" />
+            <SlideList ref="slideList" :lessonId="Number($route.params.id)" />
         </div>
     </div>
 </template>
@@ -26,9 +27,10 @@
 <script>
 import SlideList from "../components/SlideList";
 import FavoriteButton from "../components/FavoriteButton";
+import Button from "../components/Button.vue";
 
 export default {
-    components: { SlideList, FavoriteButton },
+    components: { SlideList, FavoriteButton, Button },
     data() {
         return {
             lesson: {}
@@ -41,6 +43,9 @@ export default {
         async getLesson() {
             const res = await axios.get("/lessons/" + this.$route.params.id);
             this.lesson = res.data;
+        },
+        presentSlide() {
+            this.$refs.slideList.enableFullScreen();
         }
     }
 };
